@@ -52,16 +52,9 @@ def convert(size, box):
 
 
 #Precisa receber cada arquivo xml e o local aonde vai salvar essas informacoes dos labels
-def convert_annotation(source_xml, label_dir):
-    label_name = source_xml.replace(".xml", ".txt")
-    label_name = label_name[-23:]
-    
-    dir_label = label_dir + '/labels/'
-    source_label = dir_label + label_name
-    
-    if not os.path.exists(dir_label):
-        os.makedirs(dir_label)
-    
+def convert_annotation(source_xml):
+    source_label = source_xml.replace(".xml", ".txt")
+
     in_file = open(source_xml)
     out_file = open(source_label, "w+")
     
@@ -114,7 +107,7 @@ def convert_annotation(source_xml, label_dir):
         xmin = -1
         xmax = -1
 
-def labels_from_xml(directory, path_name="", label_dir="", train_value=0, train_test_path=os.path.join(get_parent_dir(0)), count=0):
+def labels_from_xml(directory, path_name="", train_value=0, train_test_path=os.path.join(get_parent_dir(0)), count=0):
     # First get all images and xml files from path and its subfolders
     image_paths = GetFileList(directory, ".jpg")
     xml_paths = GetFileList(directory, ".xml")
@@ -129,7 +122,7 @@ def labels_from_xml(directory, path_name="", label_dir="", train_value=0, train_
         y_size, x_size, _ = np.array(Image.open(source_filename)).shape
         source_xml = image.replace(".jpg", ".xml")
         
-        convert_annotation(source_xml, label_dir)
+        convert_annotation(source_xml)
         
         if count <= train_value:
             train_file = open(train_test_path + "/train.txt", "a+")
@@ -162,7 +155,7 @@ if __name__ == "__main__":
                 for dir, subs, arq in os.walk(diretorio +"/"+subpasta):
                     for sub in subs:
                         for d, s, a in os.walk(dir+"/"+sub):
-                            count = labels_from_xml(d, path_name=d, label_dir=dir_path, train_value=int(train_value), train_test_path=PKLot_path, count=count)
+                            count = labels_from_xml(d, path_name=d, train_value=int(train_value), count=count)
                             
         i = i + 1
         count = 0
