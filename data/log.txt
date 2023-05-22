@@ -1,1 +1,0 @@
-['/home/andealmeida/Downloads/dparking/PKLot/PUCPR', '/home/andealmeida/Downloads/dparking/PKLot/UFPR04', '/home/andealmeida/Downloads/dparking/PKLot/UFPR05']
