@@ -37,9 +37,29 @@ def GetFileList(dirName, endings):
                     allFiles.append(fullPath)
     return allFiles
 
+# def convert(size, box):   
+    # x = (box[0] + box[1])/2.0 - 1
+    # y = (box[2] + box[3])/2.0 - 1
+    
+    # scale = max(x, y)
+    
+    # dw = 1./x
+    # dh = 1./y
+    
+    # w = box[1] - box[0]
+    # h = box[3] - box[2]
+    
+    # x = x*dw
+    # w = w*dw
+    # y = y*dh
+    # h = h*dh
+    # print(x,y,w,h)
+    # return (x,y,w,h)
+    
 def convert(size, box):
-    dw = 1./(size[0])
-    dh = 1./(size[1])
+    scale = max(box[0], box[1], box[2], box[3])
+    dw = 1./scale
+    dh = 1./scale
     x = (box[0] + box[1])/2.0 - 1
     y = (box[2] + box[3])/2.0 - 1
     w = box[1] - box[0]
@@ -68,6 +88,9 @@ def convert_annotation(source_xml):
         for rotatedRect in spaces:
             if rotatedRect.tag == "rotatedRect":
                 for components in rotatedRect:
+                    # if components.tag == "center":
+                        # x = float(components.attrib.get("x"))
+                        # y = float(components.attrib.get("y"))
                     if components.tag == "size":
                         w = float(components.attrib.get("w"))
                         h = float(components.attrib.get("h"))
