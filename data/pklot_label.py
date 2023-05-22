@@ -114,11 +114,10 @@ def convert_annotation(source_xml, label_dir):
         xmin = -1
         xmax = -1
 
-def labels_from_xml(directory, path_name="", label_dir="", train_value=0, train_test_path=os.path.join(get_parent_dir(0))):
+def labels_from_xml(directory, path_name="", label_dir="", train_value=0, train_test_path=os.path.join(get_parent_dir(0)), count=0):
     # First get all images and xml files from path and its subfolders
     image_paths = GetFileList(directory, ".jpg")
     xml_paths = GetFileList(directory, ".xml")
-    count = 0
     
     if not len(image_paths) == len(xml_paths):
         print("number of annotations doesnt match number of images")
@@ -143,6 +142,7 @@ def labels_from_xml(directory, path_name="", label_dir="", train_value=0, train_
             test_file.write("\n")
             test_file.close()
         count = count + 1
+    return count
 
 
 if __name__ == "__main__":
@@ -154,6 +154,7 @@ if __name__ == "__main__":
 
     dirs_paths = [PUCPR_path, UFPR04_path, UFPR05_path]
     i = 0
+    count = 0
     for dir_path in dirs_paths:
         dataset, train_value = sets[i]
         for diretorio, subpastas, arquivos in os.walk(dir_path):
@@ -161,9 +162,10 @@ if __name__ == "__main__":
                 for dir, subs, arq in os.walk(diretorio +"/"+subpasta):
                     for sub in subs:
                         for d, s, a in os.walk(dir+"/"+sub):
-                            labels_from_xml(d, path_name=d, label_dir=dir_path, train_value=int(train_value), train_test_path=PKLot_path)
+                            count = labels_from_xml(d, path_name=d, label_dir=dir_path, train_value=int(train_value), train_test_path=PKLot_path, count=count)
                             
         i = i + 1
+        count = 0
         
     
         
