@@ -6,6 +6,8 @@ from os.path import join
 from PIL import Image
 import numpy as np
 
+import fileinput
+
 sets=[('PUCPR', '2699'), ('UFPR04', '2232'), ('UFPR05', '2521')]
 
 
@@ -36,34 +38,11 @@ def GetFileList(dirName, endings):
                 if entry.endswith(ending):
                     allFiles.append(fullPath)
     return allFiles
+    
+def convert(size, x, y, w, h):
+    dw = 1./(size[0])
+    dh = 1./(size[1])
 
-# def convert(size, box):   
-    # x = (box[0] + box[1])/2.0 - 1
-    # y = (box[2] + box[3])/2.0 - 1
-    
-    # scale = max(x, y)
-    
-    # dw = 1./x
-    # dh = 1./y
-    
-    # w = box[1] - box[0]
-    # h = box[3] - box[2]
-    
-    # x = x*dw
-    # w = w*dw
-    # y = y*dh
-    # h = h*dh
-    # print(x,y,w,h)
-    # return (x,y,w,h)
-    
-def convert(size, box):
-    scale = max(box[0], box[1], box[2], box[3])
-    dw = 1./scale
-    dh = 1./scale
-    x = (box[0] + box[1])/2.0 - 1
-    y = (box[2] + box[3])/2.0 - 1
-    w = box[1] - box[0]
-    h = box[3] - box[2]
     x = x*dw
     w = w*dw
     y = y*dh
@@ -74,6 +53,11 @@ def convert(size, box):
 #Precisa receber cada arquivo xml e o local aonde vai salvar essas informacoes dos labels
 def convert_annotation(source_xml):
     source_label = source_xml.replace(".xml", ".txt")
+    source_img = source_xml.replace(".xml", ".jpg")
+    
+    img = Image.open(source_img) 
+    img_width = img.width 
+    img_height = img.height 
 
     in_file = open(source_xml)
     out_file = open(source_label, "w+")
@@ -88,41 +72,41 @@ def convert_annotation(source_xml):
         for rotatedRect in spaces:
             if rotatedRect.tag == "rotatedRect":
                 for components in rotatedRect:
-                    # if components.tag == "center":
-                        # x = float(components.attrib.get("x"))
-                        # y = float(components.attrib.get("y"))
+                    if components.tag == "center":
+                        center_x = float(components.attrib.get("x"))
+                        center_y = float(components.attrib.get("y"))
                     if components.tag == "size":
                         w = float(components.attrib.get("w"))
                         h = float(components.attrib.get("h"))
-        for countor in spaces:
-            if countor.tag == "contour":
-                for point in countor:
-                    if ymin == -1:
-                        ymin = point.attrib.get("y")
-                    elif point.attrib.get("y") < ymin:
-                        ymin = point.attrib.get("y")
+        # for countor in spaces:
+            # if countor.tag == "contour":
+                # for point in countor:
+                    # if ymin == -1:
+                        # ymin = point.attrib.get("y")
+                    # elif point.attrib.get("y") < ymin:
+                        # ymin = point.attrib.get("y")
 
-                    if ymax == -1:
-                        ymax = point.attrib.get("y")
-                    elif point.attrib.get("y") > ymax:
-                        ymax = point.attrib.get("y")
+                    # if ymax == -1:
+                        # ymax = point.attrib.get("y")
+                    # elif point.attrib.get("y") > ymax:
+                        # ymax = point.attrib.get("y")
 
-                    if xmin == -1:
-                        xmin = point.attrib.get("x")
-                    elif point.attrib.get("x") < xmin:
-                        xmin = point.attrib.get("x")
+                    # if xmin == -1:
+                        # xmin = point.attrib.get("x")
+                    # elif point.attrib.get("x") < xmin:
+                        # xmin = point.attrib.get("x")
 
-                    if xmax == -1:
-                        xmax = point.attrib.get("x")
-                    elif point.attrib.get("x") > xmax:
-                        xmax = point.attrib.get("x")
+                    # if xmax == -1:
+                        # xmax = point.attrib.get("x")
+                    # elif point.attrib.get("x") > xmax:
+                        # xmax = point.attrib.get("x")
                
         cls_id = spaces.attrib.get("occupied")
         if cls_id is None:
             print("Descartando uma vaga por nao conter a classificacao")
             continue
-        b = (float(xmin), float(xmax), float(ymin), float(ymax))
-        bb = convert((w,h), b)
+        # b = (float(xmin), float(xmax), float(ymin), float(ymax))
+        bb = convert((img_width, img_height), center_x, center_y, w, h)
         out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
         
         ymin = -1
@@ -182,9 +166,7 @@ if __name__ == "__main__":
                             
         i = i + 1
         count = 0
-        
-    
-        
+
     
     
     
